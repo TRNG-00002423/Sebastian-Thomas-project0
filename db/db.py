@@ -44,7 +44,22 @@ def init_db():
             )
         """)
 
-        print("Database initialized")
+        # these are the two default users:
+        # Employee user: employee1
+        # Employee pass: pass123
+        # Manager user: manager1 
+        # Manager pass: pass456
+        conn.execute("""
+            INSERT OR IGNORE INTO users (username, password, role)
+            VALUES ('employee1', 'pass123', 'Employee')
+        """)
+
+        conn.execute("""
+            INSERT OR IGNORE INTO users (username, password, role)
+            VALUES ('manager1', 'pass456', 'Manager')
+        """)
+
+        print("Database initialized and defualt accounts created")
 
 def get_user_by_username(username):
     with get_connection() as conn:
