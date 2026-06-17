@@ -66,5 +66,25 @@ class User:
             password=row[2],
             role=row[3]
         )
+    
+    def get_from_username_password(self, username, password):
+        conn = get_connection()
+        cursor = conn.execute(
+        """
+        SELECT * FROM users WHERE username = ? AND password = ?
+        """, 
+        (username,password)
+        )
+    
+        row = cursor.fetchone()
 
+        if row is None:
+            return None
+
+        return User(
+            id=row[0],
+            username=row[1],
+            password=row[2],
+            role=row[3]
+        )
 
