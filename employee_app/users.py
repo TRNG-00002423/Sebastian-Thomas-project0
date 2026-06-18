@@ -8,22 +8,24 @@ class User:
         self.role = role
 
 
-    def create(self, user:User):
+    def create(self):
         conn = db.get_connection()
         cursor = conn.execute(
             """
-            INSERT INTO users (username, password_hash, role)
+            INSERT INTO users (username, password, role)
             VALUES (?, ?, ?)
             """,
-            (user.username, user.password, user.role)
+            (self.username, self.password, self.role)
         )
 
-        user.id = cursor.lastrowid
+        self.id = cursor.lastrowid
+        conn.commit()
         conn.close()
 
-        return user
+        return self
     
-    def get_all(self):
+    @staticmethod
+    def get_all():
         conn = db.get_connection()
         cursor = conn.execute(
             """
@@ -46,7 +48,8 @@ class User:
 
         return users
 
-    def get_from_id(self,id:int):
+    @staticmethod
+    def get_from_id(id:int):
         conn = db.get_connection()
         cursor = conn.execute(
         """

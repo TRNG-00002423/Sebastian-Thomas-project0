@@ -9,22 +9,56 @@ class Expense:
         self.date = date
 
 
-    def create(self, expense:Expense):
+    # now called with just ex_expense.create()
+    def create(self):
         conn = db.get_connection()
         cursor = conn.execute(
             """
             INSERT INTO expenses (user_id, amount, description, date)
             VALUES (?, ?, ?, ?)
             """,
-            (expense.user_id, expense.amount, expense.description, expense.date)
+            (self.user_id, self.amount, self.description, self.date)
         )
 
-        expense.id = cursor.lastrowid
+        self.id = cursor.lastrowid
+        conn.commit()
         conn.close()
 
-        return expense
+        return self
     
-    def get_all(self):
+    # is called like ex_expense.edit() after modifying values
+    def edit(self):
+        conn = db.get_connection()
+        conn.execute(
+            """
+            UPDATE expenses
+            SET amount = ?, description = ?, date = ?
+            WHERE id = ?
+            """,
+            (self.amount, self.description, self.date, self.id)
+        )
+
+        conn.commit()
+        conn.close()
+
+    # needs check before hand to see if id exists and status is pending
+    @staticmethod
+    def remove(id:int):
+        conn = db.get_connection()
+        conn.execute(
+            """
+            DELETE FROM expenses WHERE id = ?
+            """,
+            (id,)
+        )
+
+        conn.commit()
+        conn.close()
+
+    # added @staticmethod so it can be called Expense.get_all()
+    # rather than ex_expense.get_all()
+    @staticmethod
+    def get_all():
         conn = db.get_connection()
         cursor = conn.execute(
             """
@@ -48,7 +82,8 @@ class Expense:
 
         return expenses
 
-    def get_from_id(self,id:int):
+    @staticmethod
+    def get_from_id(id:int):
         conn = db.get_connection()
         cursor = conn.execute(
         """

@@ -10,22 +10,24 @@ class Approval:
         self.review_date = review_date
 
 
-    def create(self, approval:Approval):
+    def create(self):
         conn = db.get_connection()
         cursor = conn.execute(
             """
             INSERT INTO approvals (expense_id, status, reviewer, comment, review_date)
             VALUES (?, ?, ?, ?, ?)
             """,
-            (approval.expense_id, approval.status, approval.reviewer, approval.comment, approval.review_date)
+            (self.expense_id, self.status, self.reviewer, self.comment, self.review_date)
         )
 
-        approval.id = cursor.lastrowid
+        self.id = cursor.lastrowid
+        conn.commit()
         conn.close()
 
-        return approval
+        return self
     
-    def get_all(self):
+    @staticmethod
+    def get_all():
         conn = db.get_connection()
         cursor = conn.execute(
             """
@@ -50,7 +52,8 @@ class Approval:
 
         return approvals
 
-    def get_from_id(self,id:int):
+    @staticmethod
+    def get_from_id(id:int):
         conn = db.get_connection()
         cursor = conn.execute(
         """
