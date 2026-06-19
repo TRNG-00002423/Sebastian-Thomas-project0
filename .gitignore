@@ -1,2 +1,7 @@
 venv/
 *.db
+__pychache__
+employee_app/__pycache__/
+employee_app/controllers/__pycache__/
+employee_app/db/__pycache__/
+employee_app/models/__pycache__/
