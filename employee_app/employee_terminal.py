@@ -1,14 +1,52 @@
-from db.users import User
-from db.approvals import Approval
-from db.expenses import Expense
+from models.approvals import Approval
+from models.expenses import Expense
+from models.users import User
 
-def validate_login(username, password):
+import controllers.approvals as controller_approval
+import controllers.expenses as controller_expense
+import controllers.users as controller_user
+from db.db import init_db
+import os
 
-    return True
+def submit_expense(user:User):
+    #clears the console, regardless of it is in windows or mac/linux
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+    print(f"{"="*25}\nExpense Report Submition{"="*25}\n")
+    while True:
+        amount = input("Please enter the amount of the expense: ")
+        try:
+            amount = int(amount)
+            break
+        except ValueError:
+            print("\nInvalid input. Please enter a valid number.")
+        
+    description = input("Please enter the description of the expense: ")
+    date = input("Please enter the date of the expense: ") 
+    
+    controller_expense.create(Expense(user.id, amount, description, date))
+    print("\n")
 
-def dashboard(username):
+#todo
+def get_one_expense(user:User):
+    #clears the console, regardless of it is in windows or mac/linux
+    os.system('cls' if os.name == 'nt' else 'clear')
+    #todo
+
+def get_all_expenses(user:User):
+    #clears the console, regardless of it is in windows or mac/linux
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+    print(f"{"="*25}\n{user.username}'s Expense Reports{"="*25}\n")
+    for expense in controller_expense.get_all_by_user(user.id):
+        print(expense)
+    print("\n")
+
+
+
+def dashboard(user:User):
     running_dash = True
-    print(f"\nWelcome Employee {username}!")
+    print(f"\nWelcome Employee {user.username}!")
 
     while running_dash:
         print("\n1. Submit a new expense report")
@@ -29,8 +67,7 @@ def dashboard(username):
             continue
         
         if user_command == 1:
-            # TODO: implement logic to submit a new expense report
-            pass
+            submit_expense(user)
         elif user_command == 2:
             # TODO: implement logic to view the status of your submitted expense reports
             pass
@@ -41,12 +78,12 @@ def dashboard(username):
             # TODO: implement logic to delete a pending expense report
             pass
         elif user_command == 5:
-            # TODO: implement logic to view a history of all approved and denied expense reports
-            pass
+            get_all_expenses(user)
         elif user_command == 6:
             running_dash = False
 
 def main():
+    init_db()
     print("Welcome to the Employee App!")
 
     running_main = True
@@ -63,8 +100,10 @@ def main():
         if user_command == 1:
             username = input("Enter your username: ")
             password = input("Enter your password: ")
-            if validate_login(username,password):
-                dashboard(username)
+            if  User.get_from_username_password(username,password):
+                dashboard(user)
+            else:
+                print("Username or password not valid, Please try again!")
         if user_command == 2:
             print("Goodbye!")
             running_main = False
