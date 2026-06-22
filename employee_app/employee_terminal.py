@@ -12,7 +12,7 @@ def submit_expense(user:User):
     #clears the console, regardless of it is in windows or mac/linux
     os.system('cls' if os.name == 'nt' else 'clear')
     
-    print(f"{"="*25}\nExpense Report Submition{"="*25}\n")
+    print(f"{'='*25}\nExpense Report Submission\n{'='*25}\n")
     while True:
         amount = input("Please enter the amount of the expense: ")
         try:
@@ -37,10 +37,63 @@ def get_all_expenses(user:User):
     #clears the console, regardless of it is in windows or mac/linux
     os.system('cls' if os.name == 'nt' else 'clear')
     
-    print(f"{"="*25}\n{user.username}'s Expense Reports{"="*25}\n")
+    print(f"{'='*25}\n{user.username}'s Expense Reports\n{'='*25}\n")
     for expense in controller_expense.get_all_by_user(user.id):
         print(expense)
     print("\n")
+
+def edit_expense(user:User):
+    os.system('cls' if os.name == 'nt' else 'clear')
+        
+    print(f"{'='*25}\nEdit Expense Report\n{'='*25}\n")
+    while True:
+        user_input = input("Please enter the expense id you would like to edit or 'exit' to exit: ")
+        if user_input == 'exit':
+            return
+        try:
+            id = int(user_input)
+            expense = controller_expense.get_from_id(id)
+            if (expense is None):
+                print("Expense does not exist. Please enter a valid expense.\n")
+            elif expense.user_id != user.id:
+                print("Invalid operation. You can only delete your own expense reports\n")
+            else:
+                break
+        except ValueError:
+            print("\nInvalid input. Please enter a valid number.\n")
+    while True:
+        amount = input(f"Please enter the new amount (Current: ${expense.amount}): ")
+        try:
+            amount = int(amount)
+            expense.amount = amount
+            break
+        except ValueError:
+            print("\nInvalid input. Please enter a valid number.")
+
+    expense.description = input(f"Please enter the new description: ")
+    expense.date = input(f"Please enter the new date : ")
+    controller_expense.edit(expense)
+
+def delete_expense(user:User):
+    os.system('cls' if os.name == 'nt' else 'clear')
+        
+    print(f"{'='*25}\nRemove Expense Report\n{'='*25}\n")
+    while True:
+        user_input = input("Please enter the expense id you would like to remove or 'exit' to exit: ").strip().lower()
+        if user_input == 'exit':
+            return
+        try:
+            id = int(user_input)
+            expense = controller_expense.get_from_id(id)
+            if (expense is None):
+                print("Expense does not exist. Please enter a valid expense.\n")
+            elif expense.user_id != user.id:
+                print("Invalid operation. You can only delete your own expense reports\n")
+            else:
+                controller_expense.remove(id)
+                break
+        except ValueError:
+            print("\nInvalid input. Please enter a valid number.\n")
 
 
 
@@ -72,11 +125,9 @@ def dashboard(user:User):
             # TODO: implement logic to view the status of your submitted expense reports
             pass
         elif user_command == 3:
-            # TODO: implement logic to edit a pending expense report
-            pass
+            edit_expense(user)
         elif user_command == 4:
-            # TODO: implement logic to delete a pending expense report
-            pass
+            delete_expense(user)
         elif user_command == 5:
             get_all_expenses(user)
         elif user_command == 6:
@@ -100,7 +151,8 @@ def main():
         if user_command == 1:
             username = input("Enter your username: ")
             password = input("Enter your password: ")
-            if  User.get_from_username_password(username,password):
+            user = user = controller_user.get_from_username_password(username, password)
+            if user is not None:
                 dashboard(user)
             else:
                 print("Username or password not valid, Please try again!")
