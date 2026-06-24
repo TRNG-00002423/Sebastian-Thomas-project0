@@ -1,6 +1,9 @@
-def seed_db(conn):
+from db import get_connection
+from db import init_db
+def seed(conn):
     cursor = conn.execute("SELECT COUNT(*) FROM users")
     if cursor.fetchone()[0] > 0:
+        #print("exist")
         return
 
     users = [
@@ -49,3 +52,8 @@ def seed_db(conn):
         """,
         approvals,
     )
+    conn.commit()
+    conn.close()
+init_db()
+seed(get_connection())
+#print("ran")

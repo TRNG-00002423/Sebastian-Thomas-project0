@@ -1,7 +1,6 @@
 import sqlite3
-from .seed import seed_db
 
-DB_NAME = "my.db"
+DB_NAME = "expenses_system_db.db"
 
 
 def get_connection():
@@ -43,5 +42,3 @@ def init_db():
                 FOREIGN KEY (reviewer) REFERENCES users(id)
             )
         """)
-
-        seed_db(conn)
