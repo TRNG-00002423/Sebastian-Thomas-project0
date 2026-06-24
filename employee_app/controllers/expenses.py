@@ -1,5 +1,5 @@
-from employee_app.db.db import get_connection
-from employee_app.models.expenses import Expense
+from db.db import get_connection
+from models.expenses import Expense
 
 def create(expense:Expense):
     conn = get_connection()

@@ -1,5 +1,5 @@
-from employee_app.db.db import get_connection
-from employee_app.models.approvals import Approval
+from db.db import get_connection
+from models.approvals import Approval
 
 def create(approval:Approval):
     conn = get_connection()
