@@ -28,10 +28,14 @@ def submit_expense(user:User):
     print("\n")
 
 #todo
-def get_one_expense(user:User):
-    #clears the console, regardless of it is in windows or mac/linux
+def get_all_non_pending_user(user:User): 
     os.system('cls' if os.name == 'nt' else 'clear')
-    #todo
+    print(f"{'='*25}\n{user.username}'s Approved or Denied Expense Reports\n{'='*25}\n")
+    for expense in controller_expense.get_all_non_pending_user(user.id):
+        print(expense)
+    print("\n")
+
+
 
 def get_all_expenses(user:User):
     #clears the console, regardless of it is in windows or mac/linux
@@ -103,10 +107,10 @@ def dashboard(user:User):
 
     while running_dash:
         print("\n1. Submit a new expense report")
-        print("2. View the status of your submitted expense reports")
+        print("2. View the status of all your submitted expense reports")
         print("3. Edit a pending expense report")
         print("4. Delete a pending expense report")
-        print("5. View a history of all approved and denied expense reports")
+        print("5. View a history of all your approved or denied expense reports")
         print("6. Logout")
 
         user_input = input("Please select an option: ")
@@ -122,14 +126,13 @@ def dashboard(user:User):
         if user_command == 1:
             submit_expense(user)
         elif user_command == 2:
-            # TODO: implement logic to view the status of your submitted expense reports
-            pass
+            get_all_expenses(user)
         elif user_command == 3:
             edit_expense(user)
         elif user_command == 4:
             delete_expense(user)
         elif user_command == 5:
-            get_all_expenses(user)
+            get_all_non_pending_user(user)
         elif user_command == 6:
             running_dash = False
 

@@ -17,7 +17,6 @@ def create(expense:Expense):
 
     return expense
 
-# is called like ex_expense.edit() after modifying values
 
 def edit(expense):
     conn = get_connection()
@@ -33,7 +32,6 @@ def edit(expense):
     conn.commit()
     conn.close()
 
-# needs check before hand to see if id exists and status is pending
 
 def remove(id:int):
     conn = get_connection()
@@ -46,9 +44,6 @@ def remove(id:int):
 
     conn.commit()
     conn.close()
-
-# added  so it can be called Expense.get_all()
-# rather than ex_expense.get_all()
 
 def get_all():
     conn = get_connection()
@@ -95,6 +90,34 @@ def get_all_by_user(id:int):
             date=row[4]
         ))
 
+    conn.close()
+
+    return expenses
+
+def get_all_non_pending_user(id:int):
+    conn = get_connection()
+
+    cursor = conn.execute(
+        """
+        SELECT * FROM expenses
+        WHERE user_id = ?
+        AND status != ?
+        """,
+        (id, 'pending')
+    )
+
+    rows = cursor.fetchall()
+    expenses = []
+
+    for row in rows:
+        expenses.append(Expense(
+            id=row[0],
+            user_id=row[1],
+            amount=row[2],
+            description=row[3],
+            date=row[4]
+        ))
+    
     conn.close()
 
     return expenses
