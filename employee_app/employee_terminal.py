@@ -5,7 +5,6 @@ from models.users import User
 import controllers.approvals as controller_approval
 import controllers.expenses as controller_expense
 import controllers.users as controller_user
-from db.db import init_db
 import os
 
 def submit_expense(user:User):
@@ -14,7 +13,7 @@ def submit_expense(user:User):
     
     print(f"{'='*25}\nExpense Report Submission\n{'='*25}\n")
     while True:
-        amount = input("Please enter the amount of the expense: ")
+        amount = input("Please enter the amount of the expense: $")
         try:
             amount = int(amount)
             break
@@ -37,14 +36,18 @@ def get_all_non_pending_user(user:User):
 
 
 
+    input("Press any key to go back to the main menu...")
+
+#todo show if it was approved or denied
 def get_all_expenses(user:User):
     #clears the console, regardless of it is in windows or mac/linux
     os.system('cls' if os.name == 'nt' else 'clear')
     
-    print(f"{'='*25}\n{user.username}'s Expense Reports\n{'='*25}\n")
+    print(f"{'='*25}\n{user.username.capitalize()}'s Expense Reports\n{'='*25}\n")
     for expense in controller_expense.get_all_by_user(user.id):
         print(expense)
     print("\n")
+    input("Press any key to go back to the main menu...")
 
 def edit_expense(user:User):
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -103,7 +106,7 @@ def delete_expense(user:User):
 
 def dashboard(user:User):
     running_dash = True
-    print(f"\nWelcome Employee {user.username}!")
+    print(f"\nWelcome Employee {user.username.capitalize()}!")
 
     while running_dash:
         print("\n1. Submit a new expense report")
@@ -136,8 +139,9 @@ def dashboard(user:User):
         elif user_command == 6:
             running_dash = False
 
+        os.system('cls' if os.name == 'nt' else 'clear')
+
 def main():
-    init_db()
     print("Welcome to the Employee App!")
 
     running_main = True
@@ -154,7 +158,8 @@ def main():
         if user_command == 1:
             username = input("Enter your username: ")
             password = input("Enter your password: ")
-            user = user = controller_user.get_from_username_password(username, password)
+            user = controller_user.get_from_username_password(username, password)
+            #print(controller_user.get_all())
             if user is not None:
                 dashboard(user)
             else:
