@@ -9,6 +9,6 @@ class Expense:
     def __str__(self) -> str:
         return (
             f"Expense #{self.id}: ${self.amount} for {self.description} "
-            f"on {self.date} (user #{self.user_id})"
+            f"on {self.date}"
         )
     
