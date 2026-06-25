@@ -55,6 +55,6 @@ def seed(conn):
     )
     conn.commit()
     conn.close()
+
 init_db()
 seed(get_connection())
-#print("ran")
