@@ -1,5 +1,5 @@
-from employee_app.db.db import get_connection
-from  employee_app.models.approvals import Approval
+from db.db import get_connection
+from  models.approvals import Approval
 
 def create(approval:Approval):
     conn = get_connection()
@@ -67,3 +67,28 @@ def get_from_id(id:int):
     )
 
 
+def get_from_expenseid(id:int):
+    conn = get_connection()
+    cursor = conn.execute(
+    """
+    SELECT a.* FROM approvals a
+        JOIN expenses e ON e.id = a.expense_id
+        WHERE e.id = ?
+    """, 
+    (id,)
+    )
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        return None
+
+    return Approval(
+            id= row[0],
+            expense_id=row[1],
+            status=row[2],
+            reviewer=row[3],
+            comment=row[4],
+            review_date=row[5]
+    )
