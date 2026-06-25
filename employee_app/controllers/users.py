@@ -1,5 +1,5 @@
-from db.db import get_connection
-from models.users import User
+from employee_app.db.db import get_connection
+from employee_app.models.users import User
 
 def create(user:User):
     conn = get_connection()

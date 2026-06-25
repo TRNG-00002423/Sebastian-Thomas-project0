@@ -1,5 +1,5 @@
-from db.db import get_connection
-from models.expenses import Expense
+from employee_app.db.db import get_connection
+from employee_app.models.expenses import Expense
 
 def create(expense:Expense):
     conn = get_connection()
@@ -99,11 +99,12 @@ def get_all_non_pending_user(id:int):
 
     cursor = conn.execute(
         """
-        SELECT * FROM expenses
-        WHERE user_id = ?
-        AND status != ?
+        SELECT e.* FROM expenses e
+        JOIN approvals a ON e.id = a.expense_id
+        WHERE e.user_id = ?
+        AND a.status != 'pending'
         """,
-        (id, 'pending')
+        (id,)
     )
 
     rows = cursor.fetchall()
@@ -111,15 +112,14 @@ def get_all_non_pending_user(id:int):
 
     for row in rows:
         expenses.append(Expense(
-            id=row[0],
-            user_id=row[1],
-            amount=row[2],
-            description=row[3],
-            date=row[4]
+            id=row['id'],
+            user_id=row['user_id'],
+            amount=row['amount'],
+            description=row['description'],
+            date=row['date']
         ))
     
     conn.close()
-
     return expenses
 
 def get_from_id(id:int):
