@@ -29,7 +29,6 @@ def submit_expense(user:User):
     controller_approval.create(Approval(expense.id))
     print("\n")
 
-#todo
 def get_all_non_pending_user(user:User): 
     os.system('cls' if os.name == 'nt' else 'clear')
     print(f"{'='*25}\n{user.username}'s Approved or Denied Expense Reports\n{'='*25}\n")
@@ -41,7 +40,6 @@ def get_all_non_pending_user(user:User):
 
     input("Press any key to go back to the main menu...")
 
-#todo show if it was approved or denied
 def get_all_expenses(user:User):
     #clears the console, regardless of it is in windows or mac/linux
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -57,8 +55,8 @@ def edit_expense(user:User):
         
     print(f"{'='*25}\nEdit Expense Report\n{'='*25}\n")
     while True:
-        user_input = input("Please enter the expense id you would like to edit or 'exit' to exit: ")
-        if user_input == 'exit':
+        user_input = input("Please enter the expense id you would like to edit (press q to exit): ")
+        if user_input == 'q':
             return
         try:
             id = int(user_input)
@@ -66,7 +64,9 @@ def edit_expense(user:User):
             if (expense is None):
                 print("Expense does not exist. Please enter a valid expense.\n")
             elif expense.user_id != user.id:
-                print("Invalid operation. You can only delete your own expense reports\n")
+                print("Invalid operation. You can only edit your own expense reports\n")
+            elif (controller_approval.get_from_expenseid(expense.id)).status != "pending":
+                print("Invalid operation. You can only edit pending expense reports\n")
             else:
                 break
         except ValueError:
@@ -74,25 +74,30 @@ def edit_expense(user:User):
     while True:
         amount = input(f"Please enter the new amount (Current: ${expense.amount}): ")
         try:
+            if amount == "":
+                break
             amount = int(amount)
             expense.amount = amount
             break
         except ValueError:
             print("\nInvalid input. Please enter a valid number.")
 
-    expense.description = input(f"Please enter the new description: ")
-    expense.date = input(f"Please enter the new date : ")
+    description = input(f"Please enter the new description (Current: {expense.description}): ").strip()
+    date = input(f"Please enter the new date (Current: {expense.date}): ").strip()
+    expense.description = description or expense.description
+    expense.date = date or expense.date
+    
     new_expense = controller_expense.edit(expense)
-    if (controller_approval.get_from_expenseid(new_expense.id)) != "pending":
-        controller_approval.create(Approval(new_expense.id))
+    if new_expense is None:
+        print("Expense could not be updated.")
 
 def delete_expense(user:User):
     os.system('cls' if os.name == 'nt' else 'clear')
         
     print(f"{'='*25}\nRemove Expense Report\n{'='*25}\n")
     while True:
-        user_input = input("Please enter the expense id you would like to remove or 'exit' to exit: ").strip().lower()
-        if user_input == 'exit':
+        user_input = input("Please enter the expense id you would like to remove (press q to exit): ").strip().lower()
+        if user_input == 'q':
             return
         try:
             id = int(user_input)
