@@ -14,9 +14,9 @@ def submit_expense(user:User):
     print(f"{'='*25}\nExpense Report Submission\n{'='*25}\n")
     while True:
         amount = input("Please enter the amount of the expense (or q to exit): $")
+        if amount.casefold() == 'q':
+            return
         try:
-            if amount.casefold() == 'q':
-                break
             amount = int(amount)
             break
         except ValueError:
@@ -35,8 +35,6 @@ def get_all_non_pending_user(user:User):
     for expense in controller_expense.get_all_non_pending_user(user.id):
         print(f"{expense} Status: {controller_approval.get_from_expenseid(expense.id).status}")
     print("\n")
-
-
 
     input("Press any key to go back to the main menu...")
 
