@@ -1,15 +1,15 @@
 import sqlite3
-
-DB_NAME = "expenses_system_db.db"
-
+import os
+DB_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(DB_DIR, "expenses_system_db.db")
 
 def get_connection():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    with sqlite3.connect(DB_NAME) as conn:
+    with get_connection() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
