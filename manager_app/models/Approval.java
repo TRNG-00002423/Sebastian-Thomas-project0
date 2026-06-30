@@ -69,4 +69,16 @@ public class Approval {
     public void setReview_date(String review_date) {
         this.review_date = review_date;
     }
+
+    @Override
+    public String toString() {
+        return "Approval{" +
+                "id=" + id +
+                ", expense_id=" + expense_id +
+                ", reviewer=" + reviewer +
+                ", status='" + status + '\'' +
+                ", comment='" + comment + '\'' +
+                ", review_date='" + review_date + '\'' +
+                '}';
+    }
 }

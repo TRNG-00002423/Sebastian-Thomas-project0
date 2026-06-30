@@ -61,5 +61,16 @@ public class Expense {
         this.date = date;
     }
 
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", user_id=" + user_id +
+                ", amount=" + amount +
+                ", description='" + description + '\'' +
+                ", date='" + date + '\'' +
+                '}';
+    }
+
     
 }
