@@ -2,6 +2,8 @@ from models.users import User
 
 import os
 import requests
+import getpass
+from datetime import datetime
 
 BASE_URL = "http://127.0.0.1:5050"
 
@@ -11,7 +13,7 @@ def submit_expense(user:User):
     print(f"{'='*25}\nExpense Report Submission\n{'='*25}\n")
     while True:
         amount = input("Please enter the amount of the expense (or q to exit): $")
-        if amount.casefold() == 'q':
+        if amount.strip().lower() == 'q':
             return
         try:
             amount = int(amount)
@@ -20,7 +22,17 @@ def submit_expense(user:User):
             print("\nInvalid input. Please enter a valid number.")
         
     description = input("Please enter the description of the expense: ")
-    date = input("Please enter the date of the expense: ") 
+    while True:
+        date = input("Please enter the date of the expense (YYYY-MM-DD): ").strip()
+        try:
+            parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
+            if parsed_date > datetime.today().date():
+                print("\nInvalid date. The expense date cannot be in the future.\n")
+                continue
+            break
+        except ValueError:
+            print("\nInvalid format. Please use the YYYY-MM-DD.\n")
+
     
     payload = {
         "user_id": user.id,
@@ -84,7 +96,7 @@ def edit_expense(user:User):
         
     print(f"{'='*25}\nEdit Expense Report\n{'='*25}\n")
     while True:
-        user_input = input("Please enter the expense id you would like to edit (press q to exit): ")
+        user_input = input("Please enter the expense id you would like to edit (press q to exit): ").strip().lower()
         if user_input == 'q':
             return
         try:
@@ -121,9 +133,23 @@ def edit_expense(user:User):
             print("\nInvalid input. Please enter a valid number.")
 
     description = input(f"Please enter the new description (Current: {expense['description']}): ").strip()
-    date = input(f"Please enter the new date (Current: {expense['date']}): ").strip()
+    while True:
+        date_input = input(f"Please enter the new date (YYYY-MM-DD) (Current: {expense['date']}): ").strip()
+        if date_input == "":
+            break
+
+        try:
+            parsed_date = datetime.strptime(date_input, "%Y-%m-%d").date()
+            if parsed_date > datetime.today().date():
+                print("\nInvalid date. The expense date cannot be in the future.\n")
+                continue
+            expense['date'] = date_input
+            break
+        except ValueError:
+            print("\nInvalid format. Please use the YYYY-MM-DD.\n")
+
     expense['description'] = description or expense['description']
-    expense['date'] = date or expense['date']
+    expense['date'] = date_input or expense['date']
     
     payload = {
         "user_id": user.id,
@@ -172,19 +198,23 @@ def dashboard(user:User):
         print("3. Edit a pending expense report")
         print("4. Delete a pending expense report")
         print("5. View a history of all your approved or denied expense reports")
-        print("6. Logout")
+        print("Press q to Logout")
 
-        user_input = input("Please select an option: ")
+        user_input = input("\nPlease select an option: ").strip().lower()
+        
+        if user_input == 'q':
+            running_dash = False
+            continue
         try:
             user_command = int(user_input)
-            if user_command < 1 or user_command > 6:
-                print("Invalid operation. Please enter a valid option.")
+            if user_command < 1 or user_command > 5:
+                print("Invalid operation. Please enter a valid option (1-5 or q).")
                 continue
         except ValueError as e:
-            print("\nInvalid input. Please enter a valid number.")
+            print("\nInvalid input. Please enter a valid option (1-5 or q).")
             continue
         
-        if user_command == 1:#create
+        if user_command == 1:
             submit_expense(user)
 
         elif user_command == 2:
@@ -199,9 +229,6 @@ def dashboard(user:User):
         elif user_command == 5:
             get_all_non_pending_user(user)
 
-        elif user_command == 6:
-            running_dash = False
-
         os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
@@ -210,20 +237,24 @@ def main():
     running_main = True
 
     while running_main:
-        user_input = input("Please type 1 to login or 2 to exit: ")
+        user_input = input("Please type 1 to login or q to exit: ").strip().lower()
+        if user_input == 'q':
+            print("Goodbye!")
+            running_main = False
+            continue
         try:
             user_command = int(user_input)
-            if user_command < 1 or user_command > 2:
-                print("Invalid operation. Please enter 1 or 2.")
+            if user_command != 1:
+                print("Invalid operation. Please enter 1 or q.")
                 continue
         except ValueError as e:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter 1 or q.")
             continue
         
         if user_command == 1:
             
             username = input("Enter your username: ")
-            password = input("Enter your password: ")
+            password = getpass.getpass(prompt="Enter your password: ")
             package = {
                 "username": username,
                 "password": password
@@ -247,9 +278,6 @@ def main():
             else:
                 print("Username or password not valid, Please try again!")
                 continue
-        if user_command == 2:
-            print("Goodbye!")
-            running_main = False
     
 
 if __name__ == "__main__":
